@@ -1,7 +1,7 @@
-title: "Understanding Semivariograms"
-author: "Daniel M. Parker (w/ some help from ChatGPT)"
+---
+title: "Semivariograms part 1"
+author: "Daniel M. Parker (w/ help from ChatGPT)"
 date: "`r Sys.Date()`"
-
 ---
 
 # Introduction to Semivariograms
@@ -49,7 +49,7 @@ data <- data.frame(Distance = distances, Semivariance = semivariance)
 
 # Plot using ggplot2
 ggplot(data, aes(x = Distance, y = Semivariance)) +
-  geom_line(color = "blue", linewidth = 1.2) +  # Semivariogram line
+  geom_line(color = "blue", size = 1.2) +  # Semivariogram line
   geom_hline(yintercept = sill, linetype = "dashed", color = "red") +  # Sill
   geom_hline(yintercept = nugget, linetype = "dashed", color = "green") +  # Nugget
   geom_vline(xintercept = range_value, linetype = "dashed", color = "purple") +  # Range
@@ -63,11 +63,48 @@ ggplot(data, aes(x = Distance, y = Semivariance)) +
 
 ---
 
+# **Basic Variogram Statistics**
+
+### **1. Sill - Nugget**
+- Measures the structured spatial variance.
+- **Large value** → Strong spatial structure.
+- **Small value** → Weak spatial dependence.
+
+### **2. Relative Nugget Effect (Nugget/Sill)**
+- **High (~1)** → Mostly random noise.
+- **Low (~0)** → Strong spatial structure.
+
+### **3. Range-to-Distance Ratio (Range / Max Distance)**
+- **Close to 1** → Strong correlation across the study area.
+- **Close to 0** → Correlation fades quickly.
+
+### **4. Partial Sill (Sill - Nugget)**
+- Measures the variance **explained by spatial dependence**.
+
+### **5. Proportion of Spatially Structured Variation**
+- **Formula:** Partial Sill / Sill.
+- **Close to 1** → Mostly structured.
+- **Close to 0** → Mostly random.
+
+### **6. Mean Variogram Value Over Specific Lag Distances**
+- Helps analyze how spatial dependence changes at different distances.
+
+### **7. Relative Range (Range / Study Area Size)**
+- **Close to 1** → Correlation spans the entire study area.
+- **Much less than 1** → Limited spatial dependence.
+- **This will be discussed briefly at the end of the tutorial.**
+
+### **8. Anisotropy**
+- Sometimes spatial dependence varies by direction, a phenomenon known as **anisotropy**.
+- To measure anisotropy, we can compute variograms along different angles (e.g., **0°, 45°, 90°**).
+- If spatial correlation differs by direction, we can quantify it using **anisotropy ratios**.
+
+---
+
 # **Working Through a Real Example: The Meuse Dataset**
 ```{r empirical-variogram, message=FALSE}
 library(sp)
 library(gstat)
-library(gridExtra)
 
 data(meuse, package = "sp")
 coordinates(meuse) <- ~x+y  # Define spatial coordinates
@@ -84,39 +121,11 @@ print(vgm_model_nugget)
 plot(variogram_model, vgm_model_nugget, main = "Fitted Semivariogram Model")
 ```
 
----
 
-# **Comparing Anisotropy Across Different Angles**
-```{r anisotropy-comparison, message=FALSE}
-# Compute directional variograms
-variogram_0 <- variogram(zinc ~ 1, meuse, alpha = 0, cutoff = 1000, width = 50)
-variogram_90 <- variogram(zinc ~ 1, meuse, alpha = 90, cutoff = 1000, width = 50)
-variogram_45 <- variogram(zinc ~ 1, meuse, alpha = 45, cutoff = 1000, width = 50)
-variogram_135 <- variogram(zinc ~ 1, meuse, alpha = 135, cutoff = 1000, width = 50)
 
-# Fit anisotropic models
-anisotropic_model <- vgm(psill = 150000, model = "Sph", range = 800, anis = c(45, 0.5), nugget = 5000)
-
-vgm_aniso_0 <- fit.variogram(variogram_0, model = anisotropic_model)
-vgm_aniso_90 <- fit.variogram(variogram_90, model = anisotropic_model)
-vgm_aniso_45 <- fit.variogram(variogram_45, model = anisotropic_model)
-vgm_aniso_135 <- fit.variogram(variogram_135, model = anisotropic_model)
-
-# Plot all directional variograms
-grid.arrange(
-  plot(variogram_0, vgm_aniso_0, main = "0° (East-West)"),
-  plot(variogram_90, vgm_aniso_90, main = "90° (North-South)"),
-  plot(variogram_45, vgm_aniso_45, main = "45° (NE-SW)"),
-  plot(variogram_135, vgm_aniso_135, main = "135° (NW-SE)"),
-  ncol = 2
-)
+### **Rendering the RMarkdown File**
+Run in R:
+```r
+rmarkdown::render("variogram_tutorial1.Rmd")
 ```
-
----
-
-# **Conclusion**
-- **Semivariograms quantify spatial dependence**.
-- **Key parameters**: **nugget, sill, and range**.
-- **Basic statistics help interpret spatial structure**.
-- **Comparing directional variograms helps detect anisotropy**.
-- **Next step**: Use **kriging** for spatial interpolation.
+This will create a Markdown file that you can push to GitHub.
