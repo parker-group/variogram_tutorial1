@@ -1,0 +1,122 @@
+title: "Understanding Semivariograms"
+author: "Your Name"
+date: "`r Sys.Date()`"
+output: github_document
+---
+
+# Introduction to Semivariograms
+A semivariogram describes how data values change with increasing distance. It helps quantify **spatial dependence**.
+
+## Spatial Dependence and Tobler's Law
+Tobler’s First Law of Geography states:
+> "Everything is related to everything else, but near things are more related than distant things."
+
+In semivariograms:
+- **Low distances** → Similar values (low variance).
+- **Large distances** → Increasing dissimilarity.
+
+---
+
+# **Semivariogram Components**
+The key parameters of a semivariogram are:
+
+- **Nugget (`C₀`)**: Variance at distance = 0 (measurement error or microscale variation).
+- **Sill (`C`)**: Total variance when the semivariogram levels off.
+- **Range (`A`)**: Distance at which spatial autocorrelation disappears.
+
+### **Plotting a Sample Semivariogram in R**
+```{r semivariogram-plot, echo=FALSE}
+library(ggplot2)
+
+# Define parameters
+distances <- seq(0, 100, by=5)  # Distance values
+nugget <- 15  # Nugget above zero
+sill <- 160  # Sill where semivariance levels off
+range_value <- 30  # Range where spatial dependence disappears
+
+# Spherical model approximation
+spherical_variogram <- function(h, nugget, sill, range_value) {
+  ifelse(h < range_value, 
+         nugget + (sill - nugget) * (1.5 * (h / range_value) - 0.5 * (h / range_value)^3), 
+         sill)
+}
+
+# Compute semivariance values
+semivariance <- sapply(distances, spherical_variogram, nugget = nugget, sill = sill, range_value = range_value)
+
+# Create a data frame
+data <- data.frame(Distance = distances, Semivariance = semivariance)
+
+# Plot using ggplot2
+ggplot(data, aes(x = Distance, y = Semivariance)) +
+  geom_line(color = "blue", linewidth = 1.2) +  # Semivariogram line
+  geom_hline(yintercept = sill, linetype = "dashed", color = "red") +  # Sill
+  geom_hline(yintercept = nugget, linetype = "dashed", color = "green") +  # Nugget
+  geom_vline(xintercept = range_value, linetype = "dashed", color = "purple") +  # Range
+  annotate("text", x = 5, y = nugget + 5, label = "Nugget", color = "green", fontface = "bold") +
+  annotate("text", x = 80, y = sill - 5, label = "Sill", color = "red", fontface = "bold") +
+  annotate("text", x = range_value + 2, y = sill / 2, label = "Range", color = "purple", fontface = "bold", angle = 90) +
+  labs(title = "Improved Semivariogram Diagram", x = "Distance", y = "Semivariance") +
+  ylim(0, 170) +  # Set y-axis range from 0 to 170
+  theme_minimal()
+```
+
+---
+
+# **Working Through a Real Example: The Meuse Dataset**
+```{r empirical-variogram, message=FALSE}
+library(sp)
+library(gstat)
+library(gridExtra)
+
+data(meuse, package = "sp")
+coordinates(meuse) <- ~x+y  # Define spatial coordinates
+
+# Compute the Empirical Variogram
+variogram_model <- variogram(zinc ~ 1, meuse)
+plot(variogram_model, main = "Empirical Semivariogram")
+
+# Fit a Variogram Model
+vgm_model_nugget <- fit.variogram(variogram_model, 
+                                  vgm(psill = 10000, model = "Nug", range = 0, add.to = 
+                                      vgm(psill = 150000, model = "Sph", range = 600)))
+print(vgm_model_nugget)
+plot(variogram_model, vgm_model_nugget, main = "Fitted Semivariogram Model")
+```
+
+---
+
+# **Comparing Anisotropy Across Different Angles**
+```{r anisotropy-comparison, message=FALSE}
+# Compute directional variograms
+variogram_0 <- variogram(zinc ~ 1, meuse, alpha = 0, cutoff = 1000, width = 50)
+variogram_90 <- variogram(zinc ~ 1, meuse, alpha = 90, cutoff = 1000, width = 50)
+variogram_45 <- variogram(zinc ~ 1, meuse, alpha = 45, cutoff = 1000, width = 50)
+variogram_135 <- variogram(zinc ~ 1, meuse, alpha = 135, cutoff = 1000, width = 50)
+
+# Fit anisotropic models
+anisotropic_model <- vgm(psill = 150000, model = "Sph", range = 800, anis = c(45, 0.5), nugget = 5000)
+
+vgm_aniso_0 <- fit.variogram(variogram_0, model = anisotropic_model)
+vgm_aniso_90 <- fit.variogram(variogram_90, model = anisotropic_model)
+vgm_aniso_45 <- fit.variogram(variogram_45, model = anisotropic_model)
+vgm_aniso_135 <- fit.variogram(variogram_135, model = anisotropic_model)
+
+# Plot all directional variograms
+grid.arrange(
+  plot(variogram_0, vgm_aniso_0, main = "0° (East-West)"),
+  plot(variogram_90, vgm_aniso_90, main = "90° (North-South)"),
+  plot(variogram_45, vgm_aniso_45, main = "45° (NE-SW)"),
+  plot(variogram_135, vgm_aniso_135, main = "135° (NW-SE)"),
+  ncol = 2
+)
+```
+
+---
+
+# **Conclusion**
+- **Semivariograms quantify spatial dependence**.
+- **Key parameters**: **nugget, sill, and range**.
+- **Basic statistics help interpret spatial structure**.
+- **Comparing directional variograms helps detect anisotropy**.
+- **Next step**: Use **kriging** for spatial interpolation.
