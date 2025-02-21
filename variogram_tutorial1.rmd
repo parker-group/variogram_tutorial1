@@ -24,7 +24,7 @@ The key parameters of a semivariogram are:
 - **Sill (`C`)**: Total variance when the semivariogram levels off.
 - **Range (`A`)**: Distance at which spatial autocorrelation disappears.
 
-### **Plotting a Sample Semivariogram in R**
+### **A basic semivariogram**
 ```{r semivariogram-plot, echo=FALSE}
 library(ggplot2)
 
@@ -49,7 +49,7 @@ data <- data.frame(Distance = distances, Semivariance = semivariance)
 
 # Plot using ggplot2
 ggplot(data, aes(x = Distance, y = Semivariance)) +
-  geom_line(color = "blue", size = 1.2) +  # Semivariogram line
+  geom_line(color = "blue", linewidth = 1.2) +  # Semivariogram line
   geom_hline(yintercept = sill, linetype = "dashed", color = "red") +  # Sill
   geom_hline(yintercept = nugget, linetype = "dashed", color = "green") +  # Nugget
   geom_vline(xintercept = range_value, linetype = "dashed", color = "purple") +  # Range
