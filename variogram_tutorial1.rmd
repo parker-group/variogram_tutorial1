@@ -48,6 +48,7 @@ semivariance <- sapply(distances, spherical_variogram, nugget = nugget, sill = s
 data <- data.frame(Distance = distances, Semivariance = semivariance)
 
 # Plot using ggplot2
+library(ggplot2)
 ggplot(data, aes(x = Distance, y = Semivariance)) +
   geom_line(color = "blue", linewidth = 1.2) +  # Semivariogram line
   geom_hline(yintercept = sill, linetype = "dashed", color = "red") +  # Sill
