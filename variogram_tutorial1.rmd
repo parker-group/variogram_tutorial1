@@ -12,7 +12,7 @@ Tobler’s First Law of Geography states:
 > "Everything is related to everything else, but near things are more related than distant things."
 
 In semivariograms:
-- **Low distances** → Similar values (low variance).
+- **Short distances** → Similar values (low variance).
 - **Large distances** → Increasing dissimilarity.
 
 ---
