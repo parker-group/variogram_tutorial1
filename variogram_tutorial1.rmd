@@ -2,7 +2,16 @@
 title: "Semivariograms part 1"
 author: "Daniel M. Parker (w/ help from ChatGPT)"
 date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float: false
+    number_sections: false
+    code_folding: "hide"
+    theme: cosmo
+    highlight: textmate
 ---
+
 
 # Introduction to Semivariograms
 A semivariogram describes how data values change with increasing distance. It helps quantify **spatial dependence**.
