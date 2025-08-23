@@ -10,19 +10,19 @@ A short, self-contained tutorial for building experimental and fitted semivariog
 
 ## Quick start
 
-### A) View-only (R script provided but it is already run for you)
+### A) View-only (R script shown, but already run for you)
 Open the rendered HTML tutorial:
 - `variogram_tutorial.html` (in this repo)
 - https://parker-group.github.io/variogram_tutorial1/
 
-### B) Hands-on (R installed on your computer, you run the script)
+### B) Hands-on (R installed on your computer - you run the script)
 In R:
 ```r
 install.packages(c("gstat", "sp", "sf", "rmarkdown"))  # first time
 rmarkdown::render("variogram_tutorial1.rmd", output_format = "html_document")
 ```
 
-### C) Hands-on in your browser (you run the R script through your browser)
+### C) Hands-on in your browser (no install - you run R from your browser)
 Click to launch an interactive RStudio session with Binder:
 
 [![Launch RStudio in Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/parker-group/variogram_tutorial1/HEAD?urlpath=rstudio)
