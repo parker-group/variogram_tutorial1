@@ -13,10 +13,10 @@ output:
 ---
 
 
-# Introduction to Semivariograms
+# **Introduction to Semivariograms**
 A semivariogram describes how data values change with increasing distance. It helps quantify **spatial dependence**.
 
-## Spatial Dependence and Tobler's Law
+## **Spatial Dependence and Tobler's Law**
 Tobler’s First Law of Geography states:
 > "Everything is related to everything else, but near things are more related than distant things."
 
