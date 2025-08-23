@@ -130,6 +130,12 @@ vgm_model_nugget <- fit.variogram(variogram_model,
 print(vgm_model_nugget)
 plot(variogram_model, vgm_model_nugget, main = "Fitted Semivariogram Model")
 ```
+# Next Step
+
+For practice with your own CSV data (and side-by-side comparison of correlograms and semivariograms), see:
+
+- [Spatial Dependence Part 2 repo](https://github.com/parker-group/spatial_depend_2)  
+- [Live tutorial site](https://parker-group.github.io/spatial_depend_2/)
 
 
 
